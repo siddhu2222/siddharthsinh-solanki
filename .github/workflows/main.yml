@@ -6,16 +6,35 @@ on:
       - main
 
 jobs:
-  container-test-job:
+  build:
     runs-on: windows-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
-      - name: List files in the repository
-        run: |
-          ls ${{ github.workspace }}
-      - run: echo "🍏 This job's status is ${{ job.status }}."
-      
 
+      - name: Print repository info
+        run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
+
+      - name: List files in the repository
+        run: ls ${{ github.workspace }}
+
+      - name: Print job status
+        run: echo "🍏 This job's status is ${{ job.status }}."
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifact
+          path: ${{ github.workspace }}
+
+  deploy:
+    runs-on: windows-latest
+    needs: build  
+
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifact
+          path: ${{ github.workspace }}
